@@ -1,5 +1,7 @@
+all: kill build run
+
 run:
-	docker run -d nginx-certbot -p 80:80 -p 443:443
+	docker run -d -p 80:80 -p 443:443 nginx-certbot
 build:
 	docker build . -t nginx-certbot
 kill:

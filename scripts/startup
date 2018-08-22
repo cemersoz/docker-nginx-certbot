@@ -19,13 +19,21 @@ class CertManager(Thread):
               .format(self.email, self.update_interval)
     return os.system(command)
 
+  def start_nginx(self):
+    return os.system("nginx")
+
+  def reload_nginx(self):
+    return os.system("nginx -s reload")
+
   def run(self):
+    #self.start_nginx()
+    time.sleep(5)
     while True:
-      out_file = open(self.domains_out, 'r')
+      out_file = open(self.domains_out, 'w+')
       certed_domains = [line.strip() for line in out_file.readlines()]
       out_file.close()
 
-      out_file = open(self.domains_out, 'a')
+      out_file = open(self.domains_out, 'a+')
       domain_file = open(self.domains_in, 'r')
       for line in domain_file.readlines():
         if line.strip() not in certed_domains:

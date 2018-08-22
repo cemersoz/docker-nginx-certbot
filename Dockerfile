@@ -1,4 +1,4 @@
-FROM nginx
+FROM ubuntu:16.04
 
 VOLUME /etc/letsencrypt
 
@@ -6,19 +6,21 @@ VOLUME /etc/letsencrypt
 EXPOSE 80
 EXPOSE 443
 
-# Clean NGINX configurations
-RUN rm -f /etc/nginx/conf.d/*
-
 # Install certbot to provision certificates
-RUN add-apt-repository ppa:certbot/certbot && \
+RUN apt-get update && \
+    apt-get install nginx python-dev -y && \
+    apt-get install software-properties-common -y && \
+    add-apt-repository ppa:certbot/certbot -y && \
     apt-get update && \
-    apt-get install python-dev && \
-    apt-get install python-certbot-nginx && \
-    apt-get autoremove && \
+    apt-get install python-certbot-nginx -y && \
+    apt-get autoremove -y && \
     apt-get clean   
 
+# Create the /domains directory
+RUN mkdir /domains
+
 # Copy the domain names for which we want to get certificates
-COPY domains/domains.txt domains.txt
+COPY domains/domains.txt domains/domains.txt
 
 # Copy the scripts we are going to use
 COPY ./scripts/ /scripts
@@ -28,4 +30,4 @@ RUN chmod +x /scripts/*
 COPY ./configs/*.conf /etc/nginx/conf.d/
 
 # Start the stuff
-CMD ["/scripts/startup"]
+CMD ["python3", "/scripts/startup"]
