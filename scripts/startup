@@ -15,8 +15,8 @@ class CertManager(Thread):
     self.update_interval = update_interval
 
   def get_cert(self, domain):
-    command = "cerbot --nginx -m {0} -d {1} -n --agree-tos"\
-              .format(self.email, self.update_interval)
+    command = "certbot --nginx -m {0} -d {1} -n --agree-tos"\
+              .format(self.email, domain)
     return os.system(command)
 
   def start_nginx(self):
@@ -26,7 +26,7 @@ class CertManager(Thread):
     return os.system("nginx -s reload")
 
   def run(self):
-    #self.start_nginx()
+    self.start_nginx()
     time.sleep(5)
     while True:
       out_file = open(self.domains_out, 'w+')
@@ -37,7 +37,7 @@ class CertManager(Thread):
       domain_file = open(self.domains_in, 'r')
       for line in domain_file.readlines():
         if line.strip() not in certed_domains:
-          if self.get_cert(line.strip()):
+          if not self.get_cert(line.strip()):
             logger.info("I just got a certificate for {0}!".format(line))
             out_file.write(line.strip())
           else:
